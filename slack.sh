@@ -18,13 +18,15 @@ subject="$2"
 # Change message emoji depending on the subject - smile (RECOVERY/OK), frowning (PROBLEM), or ghost (for everything else)
 recoversub='^RECOVER(Y|ED)?$'
 if [[ "$subject" =~ ${recoversub} ]]; then
-	emoji=':smile:'
+	emoji=':zap:'
 elif [ "$subject" == 'OK' ]; then
 	emoji=':smile:'
 elif [ "$subject" == 'PROBLEM' ]; then
-	emoji=':frowning:'
+	emoji=':warning:'
+elif [ "$subject" == 'UPDATE' ]; then
+	emoji=':mag:'
 else
-	emoji=':ghost:'
+	emoji=':question:'
 fi
 
 # The message that we want to send to Slack is the "subject" value ($2 / $subject - that we got earlier)
@@ -40,5 +42,6 @@ if [[ "$proxy" != "" ]] ; then
 fi
 
 # Build our JSON payload and send it as a POST request to the Slack incoming web-hook URL
-payload="payload={\"channel\": \"${to//\"/\\\"}\", \"username\": \"${username//\"/\\\"}\", \"text\": \"${message//\"/\\\"}\", \"icon_emoji\": \"${emoji}\"}"
+payload="payload={\"channel\": \"${to//\"/\\\"}\", \"username\": \"${username//\"/\\\"}\", \"text\": \"${emoji} ${message//\"/\\\"}\", \"icon_emoji\": \"${emoji}\"}"
 curl $proxy -m 5 --data-urlencode "${payload}" $url -A 'zabbix-slack-alertscript / https://github.com/ericoc/zabbix-slack-alertscript'
+
